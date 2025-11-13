@@ -95,7 +95,8 @@ tests_sources = [
   "$_tests/GifTest.cpp",
   "$_tests/GpuRectanizerTest.cpp",
   "$_tests/GrGlyphVectorTest.cpp",
-  "$_tests/GradientTest.cpp",
+  # D3D12-only fork: Removed GradientTest (uses mock backend)
+  # "$_tests/GradientTest.cpp",
   "$_tests/HSVRoundTripTest.cpp",
   "$_tests/HashTest.cpp",
   "$_tests/HdrMetadataTest.cpp",
@@ -439,7 +440,8 @@ ganesh_tests_sources = [
   "$_tests/GaneshContextRecorderTest.cpp",
   "$_tests/GpuDrawPathTest.cpp",
   "$_tests/GrAHardwareBufferTest.cpp",
-  "$_tests/GrClipStackTest.cpp",
+  # D3D12-only fork: Removed GrClipStackTest (uses mock backend)
+  # "$_tests/GrClipStackTest.cpp",
   "$_tests/GrContextAbandonTest.cpp",
   "$_tests/GrContextFactoryTest.cpp",
   "$_tests/GrContextOOM.cpp",
@@ -448,13 +450,16 @@ ganesh_tests_sources = [
   "$_tests/GrGpuBufferTest.cpp",
   "$_tests/GrMemoryPoolTest.cpp",
   "$_tests/GrMeshTest.cpp",
-  "$_tests/GrMipMappedTest.cpp",
+  # D3D12-only fork: Removed GrMipMappedTest (uses mock backend)
+  # "$_tests/GrMipMappedTest.cpp",
   "$_tests/GrOpListFlushTest.cpp",
   "$_tests/GrPipelineDynamicStateTest.cpp",
-  "$_tests/GrPorterDuffTest.cpp",
+  # D3D12-only fork: Removed GrPorterDuffTest (uses mock backend)
+  # "$_tests/GrPorterDuffTest.cpp",
   "$_tests/GrQuadBufferTest.cpp",
   "$_tests/GrQuadCropTest.cpp",
-  "$_tests/GrRenderTaskClusterTest.cpp",
+  # D3D12-only fork: Removed GrRenderTaskClusterTest (uses mock backend)
+  # "$_tests/GrRenderTaskClusterTest.cpp",
   "$_tests/GrStyledShapeTest.cpp",
   "$_tests/GrSubmittedFlushTest.cpp",
   "$_tests/GrSurfaceResolveTest.cpp",
@@ -462,12 +467,14 @@ ganesh_tests_sources = [
   "$_tests/GrTextBlobTest.cpp",
   "$_tests/GrTextureMipMapInvalidationTest.cpp",
   "$_tests/GrThreadSafeCacheTest.cpp",
-  "$_tests/LazyProxyTest.cpp",
+  # D3D12-only fork: Removed LazyProxyTest (uses mock backend)
+  # "$_tests/LazyProxyTest.cpp",
   "$_tests/LazyStencilAttachmentTest.cpp",
   "$_tests/MatrixColorFilterTest.cpp",
   "$_tests/OpChainTest.cpp",
   "$_tests/PathRendererCacheTests.cpp",
-  "$_tests/PinnedImageTest.cpp",
+  # D3D12-only fork: Removed PinnedImageTest (uses mock backend)
+  # "$_tests/PinnedImageTest.cpp",
   "$_tests/PrimitiveProcessorTest.cpp",
   "$_tests/ProcessorTest.cpp",
   "$_tests/ProgramsTest.cpp",
