@@ -20,8 +20,6 @@
 #include "src/sksl/codegen/SkSLPipelineStageCodeGenerator.h"
 #include "src/sksl/codegen/SkSLRasterPipelineBuilder.h"
 #include "src/sksl/codegen/SkSLRasterPipelineCodeGenerator.h"
-#include "src/sksl/codegen/SkSLSPIRVCodeGenerator.h"
-#include "src/sksl/codegen/SkSLSPIRVValidator.h"
 #include "src/sksl/codegen/SkSLWGSLCodeGenerator.h"
 #include "src/sksl/codegen/SkSLWGSLValidator.h"
 #include "src/sksl/ir/SkSLFunctionDeclaration.h"
@@ -30,8 +28,6 @@
 #include "src/sksl/tracing/SkSLDebugTracePriv.h"
 #include "src/utils/SkShaderUtils.h"
 #include "tools/skslc/ProcessWorklist.h"
-
-#include "spirv-tools/libspirv.hpp"
 
 #include <fstream>
 #include <limits.h>
@@ -633,44 +629,7 @@ static ResultCode process_command(SkSpan<std::string> args) {
         return compileProgram(writeFn);
     };
 
-    if (skstd::ends_with(outputPath, ".spirv")) {
-        return compileProgram([](SkSL::Compiler& compiler,
-                                 const SkSL::ShaderCaps* shaderCaps,
-                                 SkSL::Program& program,
-                                 SkSL::OutputStream& out) {
-            return SkSL::ToSPIRV(program, shaderCaps, out, SkSL::ValidateSPIRVAndDissassemble);
-        });
-    } else if (skstd::ends_with(outputPath, ".asm.frag") ||
-               skstd::ends_with(outputPath, ".asm.vert") ||
-               skstd::ends_with(outputPath, ".asm.comp")) {
-        return compileProgram(
-                [](SkSL::Compiler& compiler,
-                   const SkSL::ShaderCaps* shaderCaps,
-                   SkSL::Program& program,
-                   SkSL::OutputStream& out) {
-                    // Compile program to SPIR-V assembly
-                    std::vector<uint32_t> spirv;
-                    if (!SkSL::ToSPIRV(program,
-                                       shaderCaps,
-                                       &spirv,
-                                       SkSL::ValidateSPIRVAndDissassemble)) {
-                        return false;
-                    }
-                    // Convert the string-stream to a SPIR-V disassembly.
-                    spvtools::SpirvTools tools(SPV_ENV_VULKAN_1_0);
-                    std::string disassembly;
-                    uint32_t options = spvtools::SpirvTools::kDefaultDisassembleOption;
-                    options |= SPV_BINARY_TO_TEXT_OPTION_COMMENT |
-                               SPV_BINARY_TO_TEXT_OPTION_INDENT |
-                               SPV_BINARY_TO_TEXT_OPTION_NESTED_INDENT;
-                    if (!tools.Disassemble(spirv.data(), spirv.size(), &disassembly, options)) {
-                        return false;
-                    }
-                    // Finally, write the disassembly to our output stream.
-                    out.write(disassembly.data(), disassembly.size());
-                    return true;
-                });
-    } else if (skstd::ends_with(outputPath, ".glsl")) {
+    if (skstd::ends_with(outputPath, ".glsl")) {
         return compileProgram([](SkSL::Compiler& compiler,
                                  const SkSL::ShaderCaps* shaderCaps,
                                  SkSL::Program& program,
@@ -689,7 +648,7 @@ static ResultCode process_command(SkSpan<std::string> args) {
                                  const SkSL::ShaderCaps* shaderCaps,
                                  SkSL::Program& program,
                                  SkSL::OutputStream& out) {
-            return SkSL::ToHLSL(program, shaderCaps, out, SkSL::ValidateSPIRVAndDissassemble);
+            return SkSL::ToHLSL(program, shaderCaps, out, nullptr);
         });
     } else if (skstd::ends_with(outputPath, ".wgsl")) {
         return compileProgram([](SkSL::Compiler& compiler,
@@ -791,7 +750,7 @@ static ResultCode process_command(SkSpan<std::string> args) {
         });
     } else {
         printf("expected output path to end with one of: .glsl, .html, .metal, .hlsl, .wgsl, "
-               ".spirv, .asm.vert, .asm.frag, .asm.comp, .skrp, .stage (got '%s')\n",
+               ".skrp, .stage (got '%s')\n",
                outputPath.c_str());
         return ResultCode::kConfigurationError;
     }

@@ -23,7 +23,6 @@
 #include "src/sksl/codegen/SkSLNativeShader.h"
 #include "src/sksl/codegen/SkSLRasterPipelineBuilder.h"
 #include "src/sksl/codegen/SkSLRasterPipelineCodeGenerator.h"
-#include "src/sksl/codegen/SkSLSPIRVCodeGenerator.h"
 #include "src/sksl/codegen/SkSLWGSLCodeGenerator.h"
 #include "src/sksl/ir/SkSLFunctionDeclaration.h"
 #include "src/sksl/ir/SkSLProgram.h"
@@ -63,7 +62,6 @@ enum class Output {
     kNone,
     kGLSL,
     kMetal,
-    kSPIRV,
     kSkRP,
     kGrMtl,
     kGrWGSL,
@@ -76,7 +74,6 @@ public:
             case Output::kNone:    return "";
             case Output::kGLSL:    return "glsl_";
             case Output::kMetal:   return "metal_";
-            case Output::kSPIRV:   return "spirv_";
             case Output::kGrMtl:   return "grmtl_";
             case Output::kGrWGSL:  return "grwgsl_";
             case Output::kSkRP:    return "skrp_";
@@ -91,9 +88,6 @@ public:
             , fCaps(GrContextOptions(), GrMockOptions())
             , fOutput(output) {
         fSettings.fOptimize = optimize;
-        // The test programs we compile don't follow Vulkan rules and thus produce invalid SPIR-V.
-        // This is harmless, so long as we don't try to validate them.
-        fSettings.fValidateSPIRV = false;
 
         this->fixUpSource();
     }
@@ -168,10 +162,6 @@ protected:
                     SkAssertResult(SkSL::ToMetal(*program, fCaps.shaderCaps(), &result));
                     break;
 
-                case Output::kSPIRV:
-                    SkAssertResult(SkSL::ToSPIRV(*program, fCaps.shaderCaps(), &result));
-                    break;
-
                 case Output::kGrWGSL:
                     SkAssertResult(SkSL::ToWGSL(*program, fCaps.shaderCaps(), &result));
                     break;
@@ -232,7 +222,6 @@ private:
   DEF_BENCH(return new SkSLCompileBench(#name, name##_SRC, /*optimize=*/true,  Output::kNone);)  \
   DEF_BENCH(return new SkSLCompileBench(#name, name##_SRC, /*optimize=*/true,  Output::kGLSL);)  \
   DEF_BENCH(return new SkSLCompileBench(#name, name##_SRC, /*optimize=*/true,  Output::kMetal);) \
-  DEF_BENCH(return new SkSLCompileBench(#name, name##_SRC, /*optimize=*/true,  Output::kSPIRV);) \
   DEF_BENCH(return new SkSLCompileBench(#name, name##_SRC, /*optimize=*/true,  Output::kSkRP);)
 
 // This fragment shader is from the third tile on the top row of GM_gradients_2pt_conical_outside.

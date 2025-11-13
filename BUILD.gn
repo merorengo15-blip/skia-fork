@@ -2863,7 +2863,6 @@ if (skia_enable_tools) {
         "fuzz/oss_fuzz/FuzzSKSL2GLSL.cpp",
         "fuzz/oss_fuzz/FuzzSKSL2Metal.cpp",
         "fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp",
-        "fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp",
         "fuzz/oss_fuzz/FuzzSKSL2WGSL.cpp",
         "fuzz/oss_fuzz/FuzzSVG.cpp",
         "fuzz/oss_fuzz/FuzzSkDescriptorDeserialize.cpp",
@@ -3610,11 +3609,6 @@ if (skia_build_fuzzers) {
 
   libfuzzer_app("sksl2pipeline") {
     sources = [ "fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp" ]
-    deps = []
-  }
-
-  libfuzzer_app("sksl2spirv") {
-    sources = [ "fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp" ]
     deps = []
   }
 

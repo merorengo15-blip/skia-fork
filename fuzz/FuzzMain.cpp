@@ -74,7 +74,6 @@ static constexpr char g_type_message[] = "How to interpret --bytes, one of:\n"
                                          "sksl2glsl\n"
                                          "sksl2metal\n"
                                          "sksl2pipeline\n"
-                                         "sksl2spirv\n"
                                          "sksl2wgsl\n"
                                          "svg_dom\n"
                                          "textblob";
@@ -108,7 +107,6 @@ static void fuzz_skruntimeeffect(const sk_sp<SkData>&);
 static void fuzz_sksl2glsl(const sk_sp<SkData>&);
 static void fuzz_sksl2metal(const sk_sp<SkData>&);
 static void fuzz_sksl2pipeline(const sk_sp<SkData>&);
-static void fuzz_sksl2spirv(const sk_sp<SkData>&);
 static void fuzz_sksl2wgsl(const sk_sp<SkData>&);
 static void fuzz_textblob_deserialize(const sk_sp<SkData>&);
 
@@ -285,10 +283,6 @@ static int fuzz_file(const SkString& path, SkString type) {
         fuzz_sksl2pipeline(std::move(bytes));
         return 0;
     }
-    if (type.equals("sksl2spirv")) {
-        fuzz_sksl2spirv(std::move(bytes));
-        return 0;
-    }
     if (type.equals("sksl2wgsl")) {
         fuzz_sksl2wgsl(std::move(bytes));
         return 0;
@@ -354,7 +348,6 @@ static std::map<std::string, std::string> cf_map = {
     {"skruntimeeffect", "skruntimeeffect"},
     {"sksl2glsl", "sksl2glsl"},
     {"sksl2metal", "sksl2metal"},
-    {"sksl2spirv", "sksl2spirv"},
     {"sksl2pipeline", "sksl2pipeline"},
 #if defined(SK_ENABLE_SKOTTIE)
     {"skottie_json", "skottie_json"},
@@ -881,16 +874,6 @@ static void fuzz_sksl2pipeline(const sk_sp<SkData>& data) {
         SkDebugf("[terminated] Success! Compiled input to pipeline stage.\n");
     } else {
         SkDebugf("[terminated] Could not compile input to pipeline stage.\n");
-    }
-}
-
-bool FuzzSKSL2SPIRV(const uint8_t *data, size_t size);
-
-static void fuzz_sksl2spirv(const sk_sp<SkData>& data) {
-    if (FuzzSKSL2SPIRV(data->bytes(), data->size())) {
-        SkDebugf("[terminated] Success! Compiled input to SPIR-V.\n");
-    } else {
-        SkDebugf("[terminated] Could not compile input to SPIR-V.\n");
     }
 }
 

@@ -77,12 +77,12 @@ deps = {
   #"third_party/externals/vulkanmemoryallocator"  : "https://chromium.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator@a6bfc237255a6bac1513f7c1ebde6d8aed6b5191",
   # D3D12-only fork: Removed vulkan-deps (Vulkan meta-repo)
   #"third_party/externals/vulkan-deps"            : "https://chromium.googlesource.com/vulkan-deps@d26c41618afcbb33f4622fda6baa784b39bc43eb",
-  # D3D12-only fork: Keep spirv-cross for SPIR-V to HLSL conversion
-  "third_party/externals/spirv-cross"            : "https://chromium.googlesource.com/external/github.com/KhronosGroup/SPIRV-Cross@b8fcf307f1f347089e3c46eb4451d27f32ebc8d3",
-  # D3D12-only fork: Keep spirv-headers for SPIR-V definitions
-  "third_party/externals/spirv-headers"          : "https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Headers.git@0ff65315141cf745c1ac286084943409edbe6504",
-  # D3D12-only fork: Keep spirv-tools for SPIR-V validation
-  "third_party/externals/spirv-tools"            : "https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Tools.git@cf9d8e2d0061269947c49214471f7848c02c8ed9",
+  # D3D12-only fork: Removed spirv-cross (no longer needed with native HLSL generation)
+  #"third_party/externals/spirv-cross"            : "https://chromium.googlesource.com/external/github.com/KhronosGroup/SPIRV-Cross@b8fcf307f1f347089e3c46eb4451d27f32ebc8d3",
+  # D3D12-only fork: Removed spirv-headers (no longer needed with native HLSL generation)
+  #"third_party/externals/spirv-headers"          : "https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Headers.git@0ff65315141cf745c1ac286084943409edbe6504",
+  # D3D12-only fork: Removed spirv-tools (no longer needed with native HLSL generation)
+  #"third_party/externals/spirv-tools"            : "https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Tools.git@cf9d8e2d0061269947c49214471f7848c02c8ed9",
   "third_party/externals/vello"                  : "https://skia.googlesource.com/external/github.com/linebender/vello.git@3ee3bea02164c5a816fe6c16ef4e3a810edb7620",
   # D3D12-only fork: Removed vulkan-headers (Vulkan)
   #"third_party/externals/vulkan-headers"         : "https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Headers@3dda5a1a87b62fdf3baf4680edc41c00e85a7a22",
