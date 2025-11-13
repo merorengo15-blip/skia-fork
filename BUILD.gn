@@ -2204,7 +2204,8 @@ if (skia_enable_tools) {
           "tools/ganesh/TestContext.cpp",
           "tools/ganesh/TestOps.cpp",
           "tools/ganesh/TestOps.h",
-          "tools/ganesh/mock/MockTestContext.cpp",
+          # D3D12-only fork: Removed MockTestContext (uses mock backend)
+          # "tools/ganesh/mock/MockTestContext.cpp",
           "tools/text/gpu/TextBlobTools.cpp",
         ]
         if (skia_use_gl) {

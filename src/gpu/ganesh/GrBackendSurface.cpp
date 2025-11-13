@@ -451,8 +451,9 @@ GrBackendFormat GrBackendTexture::getBackendFormat() const {
             return GrBackendFormat::MakeDxgi(d3dInfo.fFormat);
         }
 #endif
-        case GrBackendApi::kMock:
-            return fMockInfo.getBackendFormat();
+        // D3D12-only fork: Mock backend removed
+        // case GrBackendApi::kMock:
+        //     return fMockInfo.getBackendFormat();
         default:
             return GrBackendFormat();
     }
@@ -626,8 +627,9 @@ GrBackendFormat GrBackendRenderTarget::getBackendFormat() const {
             return GrBackendFormat::MakeDxgi(info.fFormat);
         }
 #endif
-        case GrBackendApi::kMock:
-            return fMockInfo.getBackendFormat();
+        // D3D12-only fork: Mock backend removed
+        // case GrBackendApi::kMock:
+        //     return fMockInfo.getBackendFormat();
         default:
             return GrBackendFormat();
     }

@@ -471,8 +471,10 @@ ganesh_tests_sources = [
   # "$_tests/LazyProxyTest.cpp",
   "$_tests/LazyStencilAttachmentTest.cpp",
   "$_tests/MatrixColorFilterTest.cpp",
-  "$_tests/OpChainTest.cpp",
-  "$_tests/PathRendererCacheTests.cpp",
+  # D3D12-only fork: Removed OpChainTest (uses mock backend)
+  # "$_tests/OpChainTest.cpp",
+  # D3D12-only fork: Removed PathRendererCacheTests (uses mock backend)
+  # "$_tests/PathRendererCacheTests.cpp",
   # D3D12-only fork: Removed PinnedImageTest (uses mock backend)
   # "$_tests/PinnedImageTest.cpp",
   "$_tests/PrimitiveProcessorTest.cpp",
@@ -485,7 +487,8 @@ ganesh_tests_sources = [
   "$_tests/ReadWritePixelsGpuTest.cpp",
   "$_tests/RepeatedClippedBlurTest.cpp",
   "$_tests/ResourceAllocatorTest.cpp",
-  "$_tests/ResourceCacheTest.cpp",
+  # D3D12-only fork: Removed ResourceCacheTest (uses mock backend)
+  # "$_tests/ResourceCacheTest.cpp",
   "$_tests/SRGBReadWritePixelsTest.cpp",
   "$_tests/SaveLayerOriginTest.cpp",
   "$_tests/SkSLCross.cpp",
