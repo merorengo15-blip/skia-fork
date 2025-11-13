@@ -784,7 +784,7 @@ void HLSLCodeGenerator::writeSwitchStatement(const SwitchStatement& s) {
             this->writeLine("default:");
         } else {
             this->write("case ");
-            this->writeExpression(*c.value(), Precedence::kExpression);
+            this->write(std::to_string(c.value()));
             this->writeLine(":");
         }
         fIndentation++;
