@@ -193,7 +193,7 @@ bool ToHLSL(Program& program,
             OutputStream& out,
             ValidateSPIRVProc validateSPIRV) {
     TRACE_EVENT0("skia.shaders", "SkSL::ToHLSL");
-    HLSLCodeGenerator cg(&program.fContext, caps, &program, &out);
+    HLSLCodeGenerator cg(program.fContext.get(), caps, &program, &out);
     return cg.generateCode();
 }
 
@@ -215,16 +215,16 @@ void HLSLCodeGenerator::write(std::string_view s) {
     }
     if (fAtLineStart) {
         for (int i = 0; i < fIndentation; i++) {
-            fOutput->writeText("    ");
+            fOut->writeText("    ");
         }
     }
-    fOutput->writeText(std::string(s).c_str());
+    fOut->writeText(std::string(s).c_str());
     fAtLineStart = false;
 }
 
 void HLSLCodeGenerator::writeLine(std::string_view s) {
     this->write(s);
-    fOutput->writeText(fLineEnding);
+    fOut->writeText(fLineEnding);
     fAtLineStart = true;
 }
 
@@ -237,49 +237,49 @@ void HLSLCodeGenerator::finishLine() {
 std::string HLSLCodeGenerator::getTypeName(const Type& type) {
     switch (type.typeKind()) {
         case Type::TypeKind::kScalar:
-            if (type.matches(*fContext->fTypes.fFloat) ||
-                type.matches(*fContext->fTypes.fHalf)) {
+            if (type.matches(*fContext.fTypes.fFloat) ||
+                type.matches(*fContext.fTypes.fHalf)) {
                 return "float";
             }
-            if (type.matches(*fContext->fTypes.fInt) ||
-                type.matches(*fContext->fTypes.fShort)) {
+            if (type.matches(*fContext.fTypes.fInt) ||
+                type.matches(*fContext.fTypes.fShort)) {
                 return "int";
             }
-            if (type.matches(*fContext->fTypes.fUInt) ||
-                type.matches(*fContext->fTypes.fUShort)) {
+            if (type.matches(*fContext.fTypes.fUInt) ||
+                type.matches(*fContext.fTypes.fUShort)) {
                 return "uint";
             }
-            if (type.matches(*fContext->fTypes.fBool)) {
+            if (type.matches(*fContext.fTypes.fBool)) {
                 return "bool";
             }
             break;
 
         case Type::TypeKind::kVector:
-            if (type.componentType().matches(*fContext->fTypes.fFloat) ||
-                type.componentType().matches(*fContext->fTypes.fHalf)) {
+            if (type.componentType().matches(*fContext.fTypes.fFloat) ||
+                type.componentType().matches(*fContext.fTypes.fHalf)) {
                 switch (type.columns()) {
                     case 2: return "float2";
                     case 3: return "float3";
                     case 4: return "float4";
                 }
             }
-            if (type.componentType().matches(*fContext->fTypes.fInt) ||
-                type.componentType().matches(*fContext->fTypes.fShort)) {
+            if (type.componentType().matches(*fContext.fTypes.fInt) ||
+                type.componentType().matches(*fContext.fTypes.fShort)) {
                 switch (type.columns()) {
                     case 2: return "int2";
                     case 3: return "int3";
                     case 4: return "int4";
                 }
             }
-            if (type.componentType().matches(*fContext->fTypes.fUInt) ||
-                type.componentType().matches(*fContext->fTypes.fUShort)) {
+            if (type.componentType().matches(*fContext.fTypes.fUInt) ||
+                type.componentType().matches(*fContext.fTypes.fUShort)) {
                 switch (type.columns()) {
                     case 2: return "uint2";
                     case 3: return "uint3";
                     case 4: return "uint4";
                 }
             }
-            if (type.componentType().matches(*fContext->fTypes.fBool)) {
+            if (type.componentType().matches(*fContext.fTypes.fBool)) {
                 switch (type.columns()) {
                     case 2: return "bool2";
                     case 3: return "bool3";
@@ -289,8 +289,8 @@ std::string HLSLCodeGenerator::getTypeName(const Type& type) {
             break;
 
         case Type::TypeKind::kMatrix:
-            if (type.componentType().matches(*fContext->fTypes.fFloat) ||
-                type.componentType().matches(*fContext->fTypes.fHalf)) {
+            if (type.componentType().matches(*fContext.fTypes.fFloat) ||
+                type.componentType().matches(*fContext.fTypes.fHalf)) {
                 return "float" + std::to_string(type.columns()) + "x" +
                        std::to_string(type.rows());
             }
@@ -303,7 +303,7 @@ std::string HLSLCodeGenerator::getTypeName(const Type& type) {
             return std::string(type.name());
 
         case Type::TypeKind::kTexture:
-            switch (type.textureType()) {
+            switch (type.dimensions()) {
                 case SpvDim2D:
                     return "Texture2D";
                 case SpvDimRect:
@@ -399,7 +399,7 @@ bool HLSLCodeGenerator::generateCode() {
     this->writeHeader();
 
     // Analyze the program to determine requirements
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<FunctionDefinition>()) {
             const FunctionDefinition& func = element->as<FunctionDefinition>();
             if (func.declaration().isMain()) {
@@ -435,7 +435,7 @@ bool HLSLCodeGenerator::generateCode() {
     // Write all functions
     this->writeFunctions();
 
-    return fContext->fErrors->errorCount() == 0;
+    return fContext.fErrors->errorCount() == 0;
 }
 
 void HLSLCodeGenerator::writeHeader() {
@@ -456,7 +456,7 @@ void HLSLCodeGenerator::writeUniformBuffer() {
     this->writeLine("cbuffer UniformBuffer : register(b0) {");
     fIndentation++;
 
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<GlobalVarDeclaration>()) {
             const GlobalVarDeclaration& global = element->as<GlobalVarDeclaration>();
             const VarDeclaration& decl = global.varDeclaration();
@@ -486,13 +486,13 @@ void HLSLCodeGenerator::writeTextures() {
     int textureIndex = 0;
     int samplerIndex = 0;
 
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<GlobalVarDeclaration>()) {
             const GlobalVarDeclaration& global = element->as<GlobalVarDeclaration>();
             const VarDeclaration& decl = global.varDeclaration();
             const Variable& var = *decl.var();
 
-            if (var.type().isTexture()) {
+            if (var.type().typeKind() == Type::TypeKind::kTexture) {
                 this->write("Texture2D ");
                 this->write(var.name());
                 this->write(" : register(t");
@@ -519,14 +519,14 @@ void HLSLCodeGenerator::writeInputStruct() {
     fIndentation++;
 
     int location = 0;
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<GlobalVarDeclaration>()) {
             const GlobalVarDeclaration& global = element->as<GlobalVarDeclaration>();
             const VarDeclaration& decl = global.varDeclaration();
             const Variable& var = *decl.var();
 
-            if (var.modifierFlags().isInput() ||
-                (fProgram->fConfig->fKind == ProgramKind::kVertex &&
+            if (var.modifierFlags()& ModifierFlag::kIn ||
+                (fProgram.fConfig->fKind == ProgramKind::kVertex &&
                  !var.modifierFlags().isUniform())) {
                 this->write("    ");
                 this->writeType(var.type());
@@ -551,13 +551,13 @@ void HLSLCodeGenerator::writeOutputStruct() {
     bool hasPosition = false;
     int location = 0;
 
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<GlobalVarDeclaration>()) {
             const GlobalVarDeclaration& global = element->as<GlobalVarDeclaration>();
             const VarDeclaration& decl = global.varDeclaration();
             const Variable& var = *decl.var();
 
-            if (var.modifierFlags().isOutput()) {
+            if (var.modifierFlags()& ModifierFlag::kOut) {
                 this->write("    ");
                 this->writeType(var.type());
                 this->write(" ");
@@ -567,7 +567,7 @@ void HLSLCodeGenerator::writeOutputStruct() {
                 if (var.name() == "sk_Position") {
                     this->write(" : SV_Position");
                     hasPosition = true;
-                } else if (fProgram->fConfig->fKind == ProgramKind::kFragment) {
+                } else if (fProgram.fConfig->fKind == ProgramKind::kFragment) {
                     // Fragment shader outputs get SV_Target
                     this->write(" : SV_Target");
                     this->write(std::to_string(location++));
@@ -588,7 +588,7 @@ void HLSLCodeGenerator::writeOutputStruct() {
 }
 
 void HLSLCodeGenerator::writeStructDefinitions() {
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<StructDefinition>()) {
             this->writeStructDefinition(element->as<StructDefinition>());
             this->writeLine();
@@ -615,16 +615,16 @@ void HLSLCodeGenerator::writeStructDefinition(const StructDefinition& s) {
 }
 
 void HLSLCodeGenerator::writeGlobalVariables() {
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<GlobalVarDeclaration>()) {
             const GlobalVarDeclaration& global = element->as<GlobalVarDeclaration>();
             const Variable& var = *global.varDeclaration().var();
 
             // Skip uniforms, inputs, outputs (already handled)
             if (var.modifierFlags().isUniform() ||
-                var.modifierFlags().isInput() ||
-                var.modifierFlags().isOutput() ||
-                var.type().isTexture()) {
+                var.modifierFlags()& ModifierFlag::kIn ||
+                var.modifierFlags()& ModifierFlag::kOut ||
+                var.type().typeKind() == Type::TypeKind::kTexture) {
                 continue;
             }
 
@@ -636,7 +636,7 @@ void HLSLCodeGenerator::writeGlobalVariables() {
 }
 
 void HLSLCodeGenerator::writeFunctions() {
-    for (const std::unique_ptr<ProgramElement>& element : fProgram->fOwnedElements) {
+    for (const ProgramElement* element : fProgram.elements()) {
         if (element->is<FunctionDefinition>()) {
             this->writeFunction(element->as<FunctionDefinition>());
             this->writeLine();
@@ -956,17 +956,17 @@ void HLSLCodeGenerator::writeSwizzle(const Swizzle& swizzle) {
 
 void HLSLCodeGenerator::writeLiteral(const Literal& l) {
     const Type& type = l.type();
-    if (type.matches(*fContext->fTypes.fFloat) ||
-        type.matches(*fContext->fTypes.fHalf)) {
+    if (type.matches(*fContext.fTypes.fFloat) ||
+        type.matches(*fContext.fTypes.fHalf)) {
         this->write(skstd::to_string(l.floatValue()));
-    } else if (type.matches(*fContext->fTypes.fInt) ||
-               type.matches(*fContext->fTypes.fShort)) {
+    } else if (type.matches(*fContext.fTypes.fInt) ||
+               type.matches(*fContext.fTypes.fShort)) {
         this->write(std::to_string(l.intValue()));
-    } else if (type.matches(*fContext->fTypes.fUInt) ||
-               type.matches(*fContext->fTypes.fUShort)) {
+    } else if (type.matches(*fContext.fTypes.fUInt) ||
+               type.matches(*fContext.fTypes.fUShort)) {
         this->write(std::to_string(l.intValue()));
         this->write("u");
-    } else if (type.matches(*fContext->fTypes.fBool)) {
+    } else if (type.matches(*fContext.fTypes.fBool)) {
         this->write(l.boolValue() ? "true" : "false");
     } else {
         SkDEBUGFAILF("unsupported literal type");
