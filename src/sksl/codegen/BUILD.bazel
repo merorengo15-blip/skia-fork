@@ -91,8 +91,6 @@ skia_cc_library(
     name = "hlsl",
     srcs = [
         "SkSLHLSLCodeGenerator.cpp",
-        "SkSLSPIRVtoHLSL.cpp",
-        "SkSLSPIRVtoHLSL.h",
         ":codegen_shared_priv",
     ],
     hdrs = [
@@ -104,11 +102,9 @@ skia_cc_library(
         "//tools/skslc:__pkg__",
     ],
     deps = [
-        ":spirv",
         "//:core",
         "//src/base",
         "//src/core:core_priv",
-        "@spirv_cross",
     ],
 )
 

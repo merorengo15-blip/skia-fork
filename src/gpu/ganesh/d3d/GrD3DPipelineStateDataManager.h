@@ -11,14 +11,14 @@
 #include "src/gpu/ganesh/GrUniformDataManager.h"
 
 #include "include/gpu/ganesh/d3d/GrD3DTypes.h"
-#include "src/gpu/ganesh/GrSPIRVUniformHandler.h"
+#include "src/gpu/ganesh/d3d/GrD3DUniformHandler.h"
 
 class GrD3DConstantRingBuffer;
 class GrD3DGpu;
 
 class GrD3DPipelineStateDataManager : public GrUniformDataManager {
 public:
-    typedef GrSPIRVUniformHandler::UniformInfoArray UniformInfoArray;
+    typedef GrD3DUniformHandler::UniformInfoArray UniformInfoArray;
 
     GrD3DPipelineStateDataManager(const UniformInfoArray&,
                                   uint32_t uniformSize);

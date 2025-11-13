@@ -10,8 +10,8 @@
 
 #include "src/gpu/SkSLToBackend.h"
 #include "src/gpu/ganesh/GrPipeline.h"
-#include "src/gpu/ganesh/GrSPIRVUniformHandler.h"
-#include "src/gpu/ganesh/GrSPIRVVaryingHandler.h"
+#include "src/gpu/ganesh/d3d/GrD3DUniformHandler.h"
+#include "src/gpu/ganesh/d3d/GrD3DVaryingHandler.h"
 #include "src/gpu/ganesh/d3d/GrD3DPipelineState.h"
 #include "src/gpu/ganesh/glsl/GrGLSLProgramBuilder.h"
 #include "src/sksl/codegen/SkSLHLSLCodeGenerator.h"
@@ -71,8 +71,8 @@ private:
     GrGLSLVaryingHandler* varyingHandler() override { return &fVaryingHandler; }
 
     GrD3DGpu* fGpu;
-    GrSPIRVVaryingHandler fVaryingHandler;
-    GrSPIRVUniformHandler fUniformHandler;
+    GrD3DVaryingHandler fVaryingHandler;
+    GrD3DUniformHandler fUniformHandler;
     GrD3DRenderTarget* fRenderTarget;
 
     using INHERITED = GrGLSLProgramBuilder;

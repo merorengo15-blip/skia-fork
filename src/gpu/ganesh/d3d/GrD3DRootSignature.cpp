@@ -7,7 +7,7 @@
 
 #include "src/gpu/ganesh/d3d/GrD3DRootSignature.h"
 
-#include "src/gpu/ganesh/GrSPIRVUniformHandler.h"
+#include "src/gpu/ganesh/d3d/GrD3DUniformHandler.h"
 #include "src/gpu/ganesh/d3d/GrD3DGpu.h"
 
 using namespace skia_private;
@@ -20,7 +20,7 @@ sk_sp<GrD3DRootSignature> GrD3DRootSignature::Make(GrD3DGpu* gpu, int numTexture
     // The first will always be our uniforms
     parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     parameters[0].Descriptor.ShaderRegister = 0;
-    parameters[0].Descriptor.RegisterSpace = GrSPIRVUniformHandler::kUniformDescriptorSet;
+    parameters[0].Descriptor.RegisterSpace = GrD3DUniformHandler::kUniformDescriptorSet;
     parameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     int parameterCount = 1;
 
@@ -28,18 +28,18 @@ sk_sp<GrD3DRootSignature> GrD3DRootSignature::Make(GrD3DGpu* gpu, int numTexture
     AutoTArray<D3D12_DESCRIPTOR_RANGE> samplerRanges(numTextureSamplers);
     AutoTArray<D3D12_DESCRIPTOR_RANGE> shaderViewRanges(numShaderViews);
     if (numTextureSamplers) {
-        // Now handle the textures and samplers. We need a range for each sampler because of the
-        // interaction between how we set bindings and spirv-cross. Each binding value is used for
-        // the register value in the HLSL shader. So setting a binding of i for a texture will give
-        // it register t[i] in HLSL. We set the bindings of textures and samplers in pairs with the
+        // Now handle the textures and samplers. We need a range for each sampler.
+        // Each binding value is used for the register value in the HLSL shader.
+        // So setting a binding of i for a texture will give it register t[i] in HLSL.
+        // We set the bindings of textures and samplers in pairs with the
         // sampler at i and the corresponding texture at i+1. Thus no textures or samplers will have
         // a contiguous range of HLSL registers so we must define a different range for each.
         for (int i = 0; i < numTextureSamplers; ++i) {
             samplerRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
             samplerRanges[i].NumDescriptors = 1;
             samplerRanges[i].BaseShaderRegister = 2 * i;
-            // Spirv-Cross uses the descriptor set as the space in HLSL
-            samplerRanges[i].RegisterSpace = GrSPIRVUniformHandler::kSamplerTextureDescriptorSet;
+            // Use the descriptor set as the space in HLSL
+            samplerRanges[i].RegisterSpace = GrD3DUniformHandler::kSamplerTextureDescriptorSet;
             // In the descriptor table the descriptors will all be contiguous.
             samplerRanges[i].OffsetInDescriptorsFromTableStart =
                     D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -47,8 +47,8 @@ sk_sp<GrD3DRootSignature> GrD3DRootSignature::Make(GrD3DGpu* gpu, int numTexture
             shaderViewRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
             shaderViewRanges[i].NumDescriptors = 1;
             shaderViewRanges[i].BaseShaderRegister = 2 * i + 1;
-            // Spirv-Cross uses the descriptor set as the space in HLSL
-            shaderViewRanges[i].RegisterSpace = GrSPIRVUniformHandler::kSamplerTextureDescriptorSet;
+            // Use the descriptor set as the space in HLSL
+            shaderViewRanges[i].RegisterSpace = GrD3DUniformHandler::kSamplerTextureDescriptorSet;
             // In the descriptor table the descriptors will all be contiguous.
             shaderViewRanges[i].OffsetInDescriptorsFromTableStart =
                     D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -62,7 +62,7 @@ sk_sp<GrD3DRootSignature> GrD3DRootSignature::Make(GrD3DGpu* gpu, int numTexture
         shaderViewRanges[numTextureSamplers].BaseShaderRegister = 2 * numTextureSamplers;
         // We share texture descriptor set
         shaderViewRanges[numTextureSamplers].RegisterSpace =
-                GrSPIRVUniformHandler::kSamplerTextureDescriptorSet;
+                GrD3DUniformHandler::kSamplerTextureDescriptorSet;
         // In the descriptor table the descriptors will all be contiguous.
         shaderViewRanges[numTextureSamplers].OffsetInDescriptorsFromTableStart =
                 D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
