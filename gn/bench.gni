@@ -62,7 +62,8 @@ bench_sources = [
   "$_bench/GrMemoryPoolBench.cpp",
   "$_bench/GrMipmapBench.cpp",
   "$_bench/GrQuadBench.cpp",
-  "$_bench/GrResourceCacheBench.cpp",
+  # D3D12-only fork: Removed GrResourceCacheBench (uses mock backend)
+  # "$_bench/GrResourceCacheBench.cpp",
   "$_bench/GradientBench.cpp",
   "$_bench/HairlinePathBench.cpp",
   "$_bench/HardStopGradientBench_ScaleNumColors.cpp",

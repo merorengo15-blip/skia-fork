@@ -280,15 +280,16 @@ ContextInfo GrContextFactory::getContextInfoInternal(ContextType type, ContextOv
             break;
         }
 #endif
-        case GrBackendApi::kMock: {
-            TestContext* sharedContext = primaryContext ? primaryContext->fTestContext : nullptr;
-            SkASSERT(ContextType::kMock == type);
-            testCtx.reset(CreateMockTestContext(sharedContext));
-            if (!testCtx) {
-                return ContextInfo();
-            }
-            break;
-        }
+        // D3D12-only fork: Mock backend removed
+        // case GrBackendApi::kMock: {
+        //     TestContext* sharedContext = primaryContext ? primaryContext->fTestContext : nullptr;
+        //     SkASSERT(ContextType::kMock == type);
+        //     testCtx.reset(CreateMockTestContext(sharedContext));
+        //     if (!testCtx) {
+        //         return ContextInfo();
+        //     }
+        //     break;
+        // }
         default:
             return ContextInfo();
     }
