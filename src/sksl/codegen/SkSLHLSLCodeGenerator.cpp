@@ -339,8 +339,7 @@ std::string HLSLCodeGenerator::getIntrinsicName(IntrinsicKind kind) {
         case k_abs_IntrinsicKind: return "abs";
         case k_acos_IntrinsicKind: return "acos";
         case k_asin_IntrinsicKind: return "asin";
-        case k_atan_IntrinsicKind: return "atan";
-        case k_atan2_IntrinsicKind: return "atan2";
+        case k_atan_IntrinsicKind: return "atan";  // Note: may be atan2, handled in writeFunctionCall
         case k_ceil_IntrinsicKind: return "ceil";
         case k_clamp_IntrinsicKind: return "clamp";
         case k_cos_IntrinsicKind: return "cos";
@@ -681,7 +680,7 @@ void HLSLCodeGenerator::writeVarDeclaration(const VarDeclaration& var) {
 
     if (var.value()) {
         this->write(" = ");
-        this->writeExpression(*var.value(), Precedence::kTopLevel);
+        this->writeExpression(*var.value(), Precedence::kExpression);
     }
 }
 
@@ -739,7 +738,7 @@ void HLSLCodeGenerator::writeBlock(const Block& b) {
 
 void HLSLCodeGenerator::writeIfStatement(const IfStatement& stmt) {
     this->write("if (");
-    this->writeExpression(*stmt.test(), Precedence::kTopLevel);
+    this->writeExpression(*stmt.test(), Precedence::kExpression);
     this->write(") ");
     this->writeStatement(*stmt.ifTrue());
     if (stmt.ifFalse()) {
@@ -756,11 +755,11 @@ void HLSLCodeGenerator::writeForStatement(const ForStatement& f) {
         this->write("; ");
     }
     if (f.test()) {
-        this->writeExpression(*f.test(), Precedence::kTopLevel);
+        this->writeExpression(*f.test(), Precedence::kExpression);
     }
     this->write("; ");
     if (f.next()) {
-        this->writeExpression(*f.next(), Precedence::kTopLevel);
+        this->writeExpression(*f.next(), Precedence::kExpression);
     }
     this->write(") ");
     this->writeStatement(*f.statement());
@@ -770,13 +769,13 @@ void HLSLCodeGenerator::writeDoStatement(const DoStatement& d) {
     this->write("do ");
     this->writeStatement(*d.statement());
     this->write(" while (");
-    this->writeExpression(*d.test(), Precedence::kTopLevel);
+    this->writeExpression(*d.test(), Precedence::kExpression);
     this->writeLine(");");
 }
 
 void HLSLCodeGenerator::writeSwitchStatement(const SwitchStatement& s) {
     this->write("switch (");
-    this->writeExpression(*s.value(), Precedence::kTopLevel);
+    this->writeExpression(*s.value(), Precedence::kExpression);
     this->writeLine(") {");
 
     for (const std::unique_ptr<Statement>& stmt : s.cases()) {
@@ -785,7 +784,7 @@ void HLSLCodeGenerator::writeSwitchStatement(const SwitchStatement& s) {
             this->writeLine("default:");
         } else {
             this->write("case ");
-            this->writeExpression(*c.value(), Precedence::kTopLevel);
+            this->writeExpression(*c.value(), Precedence::kExpression);
             this->writeLine(":");
         }
         fIndentation++;
@@ -800,13 +799,13 @@ void HLSLCodeGenerator::writeReturnStatement(const ReturnStatement& r) {
     this->write("return");
     if (r.expression()) {
         this->write(" ");
-        this->writeExpression(*r.expression(), Precedence::kTopLevel);
+        this->writeExpression(*r.expression(), Precedence::kExpression);
     }
     this->writeLine(";");
 }
 
 void HLSLCodeGenerator::writeExpressionStatement(const ExpressionStatement& s) {
-    this->writeExpression(*s.expression(), Precedence::kTopLevel);
+    this->writeExpression(*s.expression(), Precedence::kExpression);
     this->writeLine(";");
 }
 
@@ -936,7 +935,7 @@ void HLSLCodeGenerator::writePostfixExpression(const PostfixExpression& p,
 void HLSLCodeGenerator::writeIndexExpression(const IndexExpression& expr) {
     this->writeExpression(*expr.base(), Precedence::kPostfix);
     this->write("[");
-    this->writeExpression(*expr.index(), Precedence::kTopLevel);
+    this->writeExpression(*expr.index(), Precedence::kExpression);
     this->write("]");
 }
 
@@ -949,9 +948,7 @@ void HLSLCodeGenerator::writeFieldAccess(const FieldAccess& f) {
 void HLSLCodeGenerator::writeSwizzle(const Swizzle& swizzle) {
     this->writeExpression(*swizzle.base(), Precedence::kPostfix);
     this->write(".");
-    for (int c : swizzle.components()) {
-        this->write(&("xyzw"[c]), 1);
-    }
+    this->write(Swizzle::MaskString(swizzle.components()));
 }
 
 void HLSLCodeGenerator::writeLiteral(const Literal& l) {
@@ -981,9 +978,14 @@ void HLSLCodeGenerator::writeFunctionCall(const FunctionCall& c) {
     const FunctionDeclaration& decl = c.function();
 
     // Check if this is an intrinsic that needs special handling
-    if (decl.intrinsicKind() != k_not_intrinsic) {
-        std::string intrinsicName = this->getIntrinsicName(decl.intrinsicKind());
-        this->write(intrinsicName);
+    if (decl.intrinsicKind() != kNotIntrinsic) {
+        // Special case for atan: use atan2 if there are 2 arguments
+        if (decl.intrinsicKind() == k_atan_IntrinsicKind && c.arguments().size() == 2) {
+            this->write("atan2");
+        } else {
+            std::string intrinsicName = this->getIntrinsicName(decl.intrinsicKind());
+            this->write(intrinsicName);
+        }
     } else {
         this->write(decl.name());
     }

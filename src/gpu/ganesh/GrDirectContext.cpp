@@ -51,7 +51,6 @@
 #include "src/gpu/ganesh/GrThreadSafePipelineBuilder.h" // IWYU pragma: keep
 #include "src/gpu/ganesh/SurfaceContext.h"
 #include "src/gpu/ganesh/image/SkImage_GaneshBase.h"
-#include "src/gpu/ganesh/mock/GrMockGpu.h"
 #include "src/gpu/ganesh/ops/SmallPathAtlasMgr.h"
 #include "src/gpu/ganesh/surface/SkSurface_Ganesh.h"
 #include "src/gpu/ganesh/text/GrAtlasManager.h"
@@ -1187,25 +1186,26 @@ SkString GrDirectContext::dump() const {
 #endif
 
 /*************************************************************************************************/
-sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOptions) {
-    GrContextOptions defaultOptions;
-    return MakeMock(mockOptions, defaultOptions);
-}
-
-sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOptions,
-                                                 const GrContextOptions& options) {
-    sk_sp<GrDirectContext> direct(
-            new GrDirectContext(GrBackendApi::kMock,
-                                options,
-                                GrContextThreadSafeProxyPriv::Make(GrBackendApi::kMock, options)));
-
-    direct->fGpu = GrMockGpu::Make(mockOptions, options, direct.get());
-    if (!direct->init()) {
-        return nullptr;
-    }
-
-    return direct;
-}
+// D3D12-only fork: Mock backend removed
+// sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOptions) {
+//     GrContextOptions defaultOptions;
+//     return MakeMock(mockOptions, defaultOptions);
+// }
+//
+// sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOptions,
+//                                                  const GrContextOptions& options) {
+//     sk_sp<GrDirectContext> direct(
+//             new GrDirectContext(GrBackendApi::kMock,
+//                                 options,
+//                                 GrContextThreadSafeProxyPriv::Make(GrBackendApi::kMock, options)));
+//
+//     direct->fGpu = GrMockGpu::Make(mockOptions, options, direct.get());
+//     if (!direct->init()) {
+//         return nullptr;
+//     }
+//
+//     return direct;
+// }
 
 #ifdef SK_DIRECT3D
 /*************************************************************************************************/
