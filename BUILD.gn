@@ -1668,7 +1668,8 @@ skia_component("skia") {
   public_deps = [
     ":core",
     ":gpu",
-    ":graphite",
+    # D3D12-only fork: Graphite removed in Phase 1
+    # ":graphite",
     ":jpeg_encode",
     ":pdf",
     ":pdf_jpeg_helpers",
