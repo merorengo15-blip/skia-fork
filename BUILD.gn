@@ -733,15 +733,17 @@ if (skia_compile_sksl_tests) {
     sources += skia_sksl_hlsl_sources
     sources += skia_sksl_pipeline_sources
     sources += skia_sksl_tracing_sources
-    sources += skia_sksl_validate_spirv_sources
+    # D3D12-only fork: Removed SPIRV validator sources (no longer needed)
+    #sources += skia_sksl_validate_spirv_sources
     sources += skia_sksl_validate_wgsl_sources
     include_dirs = [ "." ]
     deps = [
       ":run_sksllex",
       "//third_party/dawn:tint",
-      "//third_party/externals/spirv-tools:spvtools",
-      "//third_party/externals/spirv-tools:spvtools_val",
-      "//third_party/spirv-cross:spirv_cross",
+      # D3D12-only fork: Removed SPIRV dependencies (no longer needed)
+      #"//third_party/externals/spirv-tools:spvtools",
+      #"//third_party/externals/spirv-tools:spvtools_val",
+      #"//third_party/spirv-cross:spirv_cross",
     ]
   }
 
@@ -840,12 +842,13 @@ if (skia_compile_sksl_tests) {
     lang = "--stage"
     settings = "--settings"
   }
-  compile_sksl("spirv_tests") {
-    sources = sksl_spirv_tests_sources
-    outExtensions = [ ".asm.frag" ]
-    lang = "--spirv"
-    settings = "--settings"
-  }
+  # D3D12-only fork: Removed SPIRV tests (no SPIRV support)
+  #compile_sksl("spirv_tests") {
+  #  sources = sksl_spirv_tests_sources
+  #  outExtensions = [ ".asm.frag" ]
+  #  lang = "--spirv"
+  #  settings = "--settings"
+  #}
   compile_sksl("wgsl_tests") {
     sources = sksl_wgsl_tests_sources
     outExtensions = [ ".wgsl" ]
@@ -876,7 +879,8 @@ group("compile_all_sksl_tests") {
     ":compile_sksl_hlsl_tests",
     ":compile_sksl_metal_tests",
     ":compile_sksl_skrp_tests",
-    ":compile_sksl_spirv_tests",
+    # D3D12-only fork: Removed SPIRV tests dependency
+    #":compile_sksl_spirv_tests",
     ":compile_sksl_wgsl_tests",
   ]
 }
@@ -902,7 +906,8 @@ optional("gpu_shared") {
 
   if (skia_use_direct3d) {
     sources += skia_sksl_hlsl_sources
-    deps += [ "//third_party/spirv-cross:spirv_cross" ]
+    # D3D12-only fork: Removed spirv-cross dependency (using native HLSL now)
+    #deps += [ "//third_party/spirv-cross:spirv_cross" ]
   }
 
   if (skia_use_vulkan) {
@@ -1195,15 +1200,16 @@ optional("graphite") {
       public += skia_graphite_vk_precompile_public
       sources += skia_graphite_vk_precompile_sources
     }
-    if (is_debug) {
-      sources += skia_sksl_validate_spirv_sources
-      deps += [
-        "//third_party/externals/spirv-tools:spvtools",
-
-        #spvtools depends on this but doesn't deps it in.
-        "//third_party/externals/spirv-tools:spvtools_val",
-      ]
-    }
+    # D3D12-only fork: Removed Graphite SPIRV validation (Graphite was removed)
+    #if (is_debug) {
+    #  sources += skia_sksl_validate_spirv_sources
+    #  deps += [
+    #    "//third_party/externals/spirv-tools:spvtools",
+    #
+    #    #spvtools depends on this but doesn't deps it in.
+    #    "//third_party/externals/spirv-tools:spvtools_val",
+    #  ]
+    #}
   }
   if (skia_enable_precompile) {
     public += skia_graphite_precompile_public
@@ -3229,14 +3235,15 @@ if (skia_enable_tools) {
           "tools/viewer/MSKPSlide.h",
         ]
       }
-      if (skia_use_vulkan) {
-        deps += [
-          "//third_party/externals/spirv-tools:spvtools",
-
-          #spvtools depends on this but doesn't deps it in.
-          "//third_party/externals/spirv-tools:spvtools_val",
-        ]
-      }
+      # D3D12-only fork: Removed Vulkan (and thus SPIRV tools dependencies)
+      #if (skia_use_vulkan) {
+      #  deps += [
+      #    "//third_party/externals/spirv-tools:spvtools",
+      #
+      #    #spvtools depends on this but doesn't deps it in.
+      #    "//third_party/externals/spirv-tools:spvtools_val",
+      #  ]
+      #}
       if (skia_enable_ganesh) {
         deps += [
           ":common_flags_ganesh",
