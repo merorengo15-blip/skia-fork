@@ -1819,10 +1819,11 @@ skia_component("skia") {
     ]
   }
 
-  if (skia_enable_spirv_validation) {
-    deps += [ "//third_party/externals/spirv-tools:spvtools_val" ]
-    defines += [ "SK_ENABLE_SPIRV_VALIDATION" ]
-  }
+  # D3D12-only fork: SPIRV validation disabled (skia_enable_spirv_validation = false)
+  #if (skia_enable_spirv_validation) {
+  #  deps += [ "//third_party/externals/spirv-tools:spvtools_val" ]
+  #  defines += [ "SK_ENABLE_SPIRV_VALIDATION" ]
+  #}
 
   if (skia_include_multiframe_procs) {
     sources += [ "tools/SkSharingProc.cpp" ]
