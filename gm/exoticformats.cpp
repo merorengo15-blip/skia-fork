@@ -18,7 +18,11 @@
 #include "src/gpu/ganesh/GrCaps.h"
 #include "src/gpu/ganesh/GrImageContextPriv.h"
 #include "src/gpu/ganesh/GrRecordingContextPriv.h"
-#include "src/gpu/ganesh/gl/GrGLDefines.h"
+// D3D12-only fork: GL backend removed, define texture compression constants locally
+#define GR_GL_COMPRESSED_RGB_S3TC_DXT1_EXT             0x83F0
+#define GR_GL_COMPRESSED_RGBA_S3TC_DXT1_EXT            0x83F1
+#define GR_GL_COMPRESSED_ETC1_RGB8                     0x8D64
+#define GR_GL_COMPRESSED_RGB8_ETC2                     0x9274
 #include "src/gpu/ganesh/image/SkImage_GaneshBase.h"
 #include "src/image/SkImage_Base.h"
 #include "tools/Resources.h"
